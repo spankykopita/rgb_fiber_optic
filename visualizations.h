@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 
-#define NUM_LEDS   32
+#define NUM_LEDS   3
 #define DISPLAY_HERTZ 60
 #define MAX_ROTATION_HERTZ 5.0
 
@@ -20,8 +20,6 @@ uint8_t rotationOffset = 0;
 
 uint8_t brightness = 0;
 
-uint8_t LEDS_PER_CIRCLE = NUM_LEDS / 2;
-
 CRGB leds[NUM_LEDS];
 
 viz lastViz = spinny;
@@ -34,7 +32,7 @@ void blackOut() {
 
 // Fade every LED in the array by a specified amount
 void fadeAll(byte fadeIncr) {
-  for (byte i = 0; i < LEDS_PER_CIRCLE; i++) {
+  for (byte i = 0; i < NUM_LEDS; i++) {
     leds[i] = leds[i].fadeToBlackBy(fadeIncr);
   }
 }
@@ -59,7 +57,7 @@ void setBrightnessByPeak() {
 }
 
 void setColorToPixel(int ringIndex) {
-  uint8_t colorIndex = mapToByteRange(ringIndex, 0, LEDS_PER_CIRCLE);
+  uint8_t colorIndex = mapToByteRange(ringIndex, 0, NUM_LEDS);
   leds[ringIndex] = ColorFromPalette(currentPalette, colorIndex + rotationOffset, brightness, LINEARBLEND);
 }
 
@@ -70,7 +68,7 @@ void showSpinnyRing() {
 
   setBrightnessByPeak();
 
-  for (int i = 0; i < LEDS_PER_CIRCLE; i++) {
+  for (int i = 0; i < NUM_LEDS; i++) {
     setColorToPixel(i);
   }
 }
@@ -83,7 +81,7 @@ void showSparkles() {
 
   setBrightnessByPeak();
 
-  uint8_t ledToSparkle = random8(LEDS_PER_CIRCLE);
+  uint8_t ledToSparkle = random8(NUM_LEDS);
   setColorToPixel(ledToSparkle);
   fadeAll(60);
 }

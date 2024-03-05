@@ -6,7 +6,7 @@
 #include "audio.h"
 #include "visualizations.h"
 
-#define MAX_BRIGHTNESS 255
+#define MAX_BRIGHTNESS 30
 
 // Digital
 #define LED_PIN 1
@@ -36,6 +36,9 @@ void setup() {
     } else {
       showSpinnyRing();
     }
+    // leds[0] = CRGB::Red;
+    // leds[1] = CRGB::Cyan;
+    // leds[2] = CRGB::Yellow;
 
     FastLED.show();
   });
