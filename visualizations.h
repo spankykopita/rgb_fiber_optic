@@ -3,7 +3,7 @@
 
 #define NUM_LEDS   3
 #define DISPLAY_HERTZ 60
-#define MAX_ROTATION_HERTZ 1.0 
+#define MAX_ROTATION_HERTZ 20.0 
 
 typedef enum {
   spinny,
@@ -39,18 +39,16 @@ void fadeAll(byte fadeIncr) {
 }
 
 void rotateColors() {
-  // rotationIncrement is the max speed per display refresh, but we "slow it down" based on the intensity of the music
-  rotationOffset += rotationIncrement * (amplitudeRatio - 0.5) / 0.5;
+  // rotationIncrement is the max speed per display refresh
+  rotationOffset += rotationIncrement * amplitudeRatio;
 }
 
 void setBrightnessByPeak() {
   // brightness = 255;
   // brightness = mapToByteRange(smoothedAmplitude, minAmplitude, maxAmplitude);
   // brightness = map(smoothedAmplitude, minAmplitude, maxAmplitude, 20, 255);
-  uint8_t brightnessDecay = 3;
-  int nextBrightness = isPeak ? 255 : brightness - brightnessDecay;
-  // Brightness never fully turns off
-  brightness = max(nextBrightness, 50);
+  uint8_t brightnessDecay = 10;
+  brightness = isPeak ? 255 : brightness - brightnessDecay;
 }
 
 void setColorToPixel(int ringIndex) {
@@ -59,7 +57,6 @@ void setColorToPixel(int ringIndex) {
 }
 
 void setVisualization(viz newViz) {
-  blackOut();
   visualization = newViz;
 }
 
@@ -77,8 +74,7 @@ uint8_t selectedLED = 0;
 void showStrobing() {
   setBrightnessByPeak();
 
-  selectedLED = (selectedLED + 1) % NUM_LEDS;
-
+  blackOut();
   setColorToPixel(selectedLED);
 }
 
@@ -86,9 +82,10 @@ void showSingleLED() {
   setBrightnessByPeak();
 
   if (isStartOfPeak) {
-    selectedLED = random8(NUM_LEDS);
+    selectedLED = (selectedLED + 1) % NUM_LEDS;
   }
 
+  fadeAll(100);
   setColorToPixel(selectedLED);
 }
 

@@ -49,13 +49,13 @@ void recordAmplitude() {
   Serial.print("Amplitude:");
   Serial.println(amplitude);
 
-  smoothedAmplitude = smoothedAmplitude * 0.5 + amplitude * 0.5;
+  smoothedAmplitude = smoothedAmplitude * 0.1 + amplitude * 0.9;
   Serial.print("SmoothedAmplitude:");
   Serial.println(smoothedAmplitude);
 
   float minDecay = 1.003;
   minAmplitude = min(minAmplitude * minDecay, smoothedAmplitude);
-  float maxDecay = 0.95;
+  float maxDecay = 0.98;
   maxAmplitude = max(maxAmplitude * maxDecay, smoothedAmplitude);
   Serial.print("MinAmplitude:");
   Serial.println(minAmplitude);
@@ -66,7 +66,7 @@ void recordAmplitude() {
   bool newIsPeak = amplitudeRatio > PEAK_THRESHOLD;
   isStartOfPeak = !isPeak && newIsPeak;
   isPeak = newIsPeak;
-  isSuperPeak = smoothedAmplitude > lastPeaksAmplitude * 1.4;
+  isSuperPeak = smoothedAmplitude > lastPeaksAmplitude * 1.1;
   Serial.print("IsPeak:");
   Serial.println(isPeak);
   Serial.print("IsSuperPeak:");

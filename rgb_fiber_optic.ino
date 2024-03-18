@@ -20,22 +20,21 @@ void setup() {
 
   Serial.begin(9600);
 
-  scheduler.every(53, recordAmplitude);
-  
   scheduler.every(1000 / DISPLAY_HERTZ, [](){
-    if (isStartOfPeak && isSuperPeak) {
+    recordAmplitude();
+    if (isStartOfPeak) {
       if (isSuperPeak) {
         // Change colors on "super peak"
         currentPalette = getRandomPalette();
 
-        setVisualization(spinny);
+        visualization = spinny;
       } else {
-        setVisualization(singleLED);
+        visualization = singleLED;
       }
     }
   
     if (lengthOfPeakMillis > 150) {
-      setVisualization(strobe);
+      visualization = strobe;
     }
 
     runVisualization();
@@ -45,11 +44,16 @@ void setup() {
     FastLED.show();
   });
 
-  scheduler.every(5000, [](){
+  scheduler.every(3000, [](){
     nextPalette = getRandomPalette();
   });
   scheduler.every(10, [](){
     nblendPaletteTowardPalette(currentPalette, nextPalette, 80);
+  });
+  scheduler.every(20, [](){
+    if (visualization == strobe) {
+      selectedLED = (selectedLED + 1) % NUM_LEDS;
+    }
   });
 }
 
