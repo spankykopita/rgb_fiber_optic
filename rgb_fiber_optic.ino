@@ -24,22 +24,28 @@ void setup() {
   
   scheduler.every(1000 / DISPLAY_HERTZ, [](){
     if (isStartOfPeak && isSuperPeak) {
-      // Change colors on "super peak"
-      currentPalette = getRandomPalette();
-    }
+      if (isSuperPeak) {
+        // Change colors on "super peak"
+        currentPalette = getRandomPalette();
 
-    rotateColors();
+        setVisualization(spinny);
+      } else {
+        setVisualization(singleLED);
+      }
+    }
   
     if (lengthOfPeakMillis > 150) {
-      showSparkles();
-    } else {
-      showSpinnyRing();
+      setVisualization(strobe);
     }
+
+    runVisualization();
+
+    rotateColors();
 
     FastLED.show();
   });
 
-  scheduler.every(1000, [](){
+  scheduler.every(5000, [](){
     nextPalette = getRandomPalette();
   });
   scheduler.every(10, [](){

@@ -3,11 +3,12 @@
 
 #define NUM_LEDS   3
 #define DISPLAY_HERTZ 60
-#define MAX_ROTATION_HERTZ 5.0
+#define MAX_ROTATION_HERTZ 1.0 
 
 typedef enum {
   spinny,
-  sparkle,
+  singleLED,
+  strobe,
 } viz;
 
 CRGBPalette16 currentPalette = getRandomPalette();
@@ -22,7 +23,7 @@ uint8_t brightness = 0;
 
 CRGB leds[NUM_LEDS];
 
-viz lastViz = spinny;
+viz visualization = spinny;
 
 void blackOut() {
   for (byte i = 0; i < NUM_LEDS; i++) {
@@ -57,11 +58,14 @@ void setColorToPixel(int ringIndex) {
   leds[ringIndex] = ColorFromPalette(currentPalette, colorIndex + rotationOffset, brightness, LINEARBLEND);
 }
 
-void showSpinnyRing() {
-  if (lastViz != spinny) {
-    lastViz = sparkle;
-  }
+void setVisualization(viz newViz) {
+  blackOut();
+  visualization = newViz;
+}
 
+// The actual visualizations
+
+void showSpinnyRing() {
   setBrightnessByPeak();
 
   for (int i = 0; i < NUM_LEDS; i++) {
@@ -69,15 +73,37 @@ void showSpinnyRing() {
   }
 }
 
-void showSparkles() {
-  if (lastViz != sparkle) {
-    blackOut();
-    lastViz = sparkle;
-  }
-
+uint8_t selectedLED = 0;
+void showStrobing() {
   setBrightnessByPeak();
 
-  uint8_t ledToSparkle = random8(NUM_LEDS);
-  setColorToPixel(ledToSparkle);
-  fadeAll(60);
+  selectedLED = (selectedLED + 1) % NUM_LEDS;
+
+  setColorToPixel(selectedLED);
+}
+
+void showSingleLED() {
+  setBrightnessByPeak();
+
+  if (isStartOfPeak) {
+    selectedLED = random8(NUM_LEDS);
+  }
+
+  setColorToPixel(selectedLED);
+}
+
+void runVisualization() {
+  switch (visualization) {
+    case spinny:
+      showSpinnyRing();
+      break;
+    case singleLED:
+      showSingleLED();
+      break;
+    case strobe:
+      showStrobing();
+      break;
+    default:
+      blackOut();
+  }
 }
