@@ -38,19 +38,15 @@ void fadeAll(byte fadeIncr) {
 }
 
 void rotateColors() {
-  if (TARGET_DEVICE == waterBottle) {
-    rotationOffset += rotationIncrement;
-  } else {
-    // rotationIncrement is the max speed per display refresh, but we "slow it down" based on the intensity of the music
-    rotationOffset += rotationIncrement * (amplitudeRatio - 0.5) / 0.5;
-  }
+  // rotationIncrement is the max speed per display refresh, but we "slow it down" based on the intensity of the music
+  rotationOffset += rotationIncrement * (amplitudeRatio - 0.5) / 0.5;
 }
 
 void setBrightnessByPeak() {
   // brightness = 255;
   // brightness = mapToByteRange(smoothedAmplitude, minAmplitude, maxAmplitude);
   // brightness = map(smoothedAmplitude, minAmplitude, maxAmplitude, 20, 255);
-  uint8_t brightnessDecay = TARGET_DEVICE == waterBottle ? 3 : 5;
+  uint8_t brightnessDecay = 3;
   int nextBrightness = isPeak ? 255 : brightness - brightnessDecay;
   // Brightness never fully turns off
   brightness = max(nextBrightness, 50);

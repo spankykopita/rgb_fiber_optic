@@ -6,7 +6,7 @@
 #include "audio.h"
 #include "visualizations.h"
 
-#define MAX_BRIGHTNESS 30
+#define MAX_BRIGHTNESS 255
 
 // Digital
 #define LED_PIN 1
@@ -23,9 +23,8 @@ void setup() {
   scheduler.every(53, recordAmplitude);
   
   scheduler.every(1000 / DISPLAY_HERTZ, [](){
-    if (isStartOfPeak) {
-      // Switch direction and change colors
-      rotationIncrement *= -1;
+    if (isStartOfPeak && isSuperPeak) {
+      // Change colors on "super peak"
       currentPalette = getRandomPalette();
     }
 
@@ -36,9 +35,6 @@ void setup() {
     } else {
       showSpinnyRing();
     }
-    // leds[0] = CRGB::Red;
-    // leds[1] = CRGB::Cyan;
-    // leds[2] = CRGB::Yellow;
 
     FastLED.show();
   });

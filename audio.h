@@ -12,8 +12,10 @@ unsigned int samplingPeriodMicro = round(1000000*(1.0/SAMPLING_FREQUENCY));
 unsigned int smoothedAmplitude = 100;
 float minAmplitude = 1024;
 float maxAmplitude = 0;
+unsigned int lastPeaksAmplitude;
 double amplitudeRatio = 0.0;
 bool isPeak = false;
+bool isSuperPeak = false;
 bool isStartOfPeak = false;
 unsigned long startOfPeakMillis;
 unsigned int lengthOfPeakMillis;
@@ -34,25 +36,26 @@ void recordAmplitude() {
   // Serial.print("Sample3:");
   // Serial.println(micSample3);
 
-  int minSample = 1024;
-  int maxSample = 0;
+  unsigned int minSample = 1024;
+  unsigned int maxSample = 0;
   for (int i = 0; i < SAMPLES_COUNT; i++) {
     unsigned long microseconds = micros();
-    int sample = analogRead(MICROPHONE_PIN);
+    unsigned int sample = analogRead(MICROPHONE_PIN);
     maxSample = max(maxSample, sample);
     minSample = min(minSample, sample);
     while (micros() < (microseconds + samplingPeriodMicro)) { }
   }
+  unsigned int amplitude = maxSample - minSample;
   Serial.print("Amplitude:");
-  Serial.println(maxSample - minSample);
+  Serial.println(amplitude);
 
-  smoothedAmplitude = smoothedAmplitude * 0.5 + (maxSample - minSample) * 0.5;
+  smoothedAmplitude = smoothedAmplitude * 0.5 + amplitude * 0.5;
   Serial.print("SmoothedAmplitude:");
   Serial.println(smoothedAmplitude);
 
-  float minDecay = TARGET_DEVICE == waterBottle ? 1.003 : 1.001;
+  float minDecay = 1.003;
   minAmplitude = min(minAmplitude * minDecay, smoothedAmplitude);
-  float maxDecay = TARGET_DEVICE == waterBottle ? 0.95 : 0.999;
+  float maxDecay = 0.95;
   maxAmplitude = max(maxAmplitude * maxDecay, smoothedAmplitude);
   Serial.print("MinAmplitude:");
   Serial.println(minAmplitude);
@@ -63,8 +66,11 @@ void recordAmplitude() {
   bool newIsPeak = amplitudeRatio > PEAK_THRESHOLD;
   isStartOfPeak = !isPeak && newIsPeak;
   isPeak = newIsPeak;
+  isSuperPeak = smoothedAmplitude > lastPeaksAmplitude * 1.4;
   Serial.print("IsPeak:");
   Serial.println(isPeak);
+  Serial.print("IsSuperPeak:");
+  Serial.println(isSuperPeak);
 
   Serial.print("IsStartOfPeak:");
   Serial.println(isStartOfPeak);
@@ -72,6 +78,7 @@ void recordAmplitude() {
   if (isStartOfPeak) {
     startOfPeakMillis = millis();
     lengthOfPeakMillis = 0;
+    lastPeaksAmplitude = smoothedAmplitude;
   } else if (isPeak) {
     lengthOfPeakMillis = millis() - startOfPeakMillis;
   } else {
