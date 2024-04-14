@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 #include <bluefairy.h>
+#include <PeakDetection.h> 
 #include "palettes.h"
 #include "utils.h"
 #include "audio.h"
@@ -20,6 +21,8 @@ void setup() {
 
   Serial.begin(9600);
 
+  peakDetection.begin(20, 1.4, 0.6); // sets the lag, threshold and influence
+
   scheduler.every(1000 / DISPLAY_HERTZ, [](){
     recordAmplitude();
     if (isStartOfPeak) {
@@ -33,7 +36,7 @@ void setup() {
       }
     }
   
-    if (lengthOfPeakMillis > 150) {
+    if (lengthOfPeakMillis > 50) {
       visualization = strobe;
     }
 
@@ -59,5 +62,5 @@ void setup() {
 
 void loop() {
   scheduler.loop();
-  random16_add_entropy(smoothedAmplitude + millis());
+  random16_add_entropy(analogRead(MICROPHONE_PIN) + millis());
 }
