@@ -47,7 +47,7 @@ void setBrightnessByPeak() {
   // brightness = 255;
   // brightness = mapToByteRange(smoothedAmplitude, minAmplitude, maxAmplitude);
   // brightness = map(smoothedAmplitude, minAmplitude, maxAmplitude, 20, 255);
-  uint8_t brightnessDecay = 10;
+  uint8_t brightnessDecay = 30;
   brightness = isPeak ? 255 : brightness - brightnessDecay;
 }
 

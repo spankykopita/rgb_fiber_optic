@@ -3,7 +3,8 @@
 
 #define SAMPLES_COUNT 600
 #define SAMPLING_FREQUENCY 10000 //Hz, must be less than 10000 due to ADC
-#define PEAK_THRESHOLD 0.8
+#define PEAK_THRESHOLD 0.85
+#define SUPER_PEAK_THRESHOLD 0.95
 
 // 10000 hertz of sampling is 100 microseconds per sample
 // 600 samples at 100 microseconds apiece => sampling over 60 milliseconds
@@ -12,7 +13,6 @@ unsigned int samplingPeriodMicro = round(1000000*(1.0/SAMPLING_FREQUENCY));
 unsigned int smoothedAmplitude = 100;
 float minAmplitude = 1024;
 float maxAmplitude = 0;
-unsigned int lastPeaksAmplitude;
 double amplitudeRatio = 0.0;
 bool isPeak = false;
 bool isSuperPeak = false;
@@ -55,7 +55,7 @@ void recordAmplitude() {
 
   float minDecay = 1.003;
   minAmplitude = min(minAmplitude * minDecay, smoothedAmplitude);
-  float maxDecay = 0.98;
+  float maxDecay = 0.995;
   maxAmplitude = max(maxAmplitude * maxDecay, smoothedAmplitude);
   Serial.print("MinAmplitude:");
   Serial.println(minAmplitude);
@@ -63,14 +63,16 @@ void recordAmplitude() {
   Serial.println(maxAmplitude);
 
   amplitudeRatio = (smoothedAmplitude - minAmplitude) / (maxAmplitude - minAmplitude);
+  // Serial.print("AmplitudeRatio:");
+  // Serial.println(amplitudeRatio);
   bool newIsPeak = amplitudeRatio > PEAK_THRESHOLD;
   isStartOfPeak = !isPeak && newIsPeak;
   isPeak = newIsPeak;
-  isSuperPeak = smoothedAmplitude > lastPeaksAmplitude * 1.1;
-  Serial.print("IsPeak:");
-  Serial.println(isPeak);
-  Serial.print("IsSuperPeak:");
-  Serial.println(isSuperPeak);
+  isSuperPeak = amplitudeRatio > SUPER_PEAK_THRESHOLD;
+  // Serial.print("IsPeak:");
+  // Serial.println(isPeak);
+  // Serial.print("IsSuperPeak:");
+  // Serial.println(isSuperPeak);
 
   Serial.print("IsStartOfPeak:");
   Serial.println(isStartOfPeak);
@@ -78,13 +80,12 @@ void recordAmplitude() {
   if (isStartOfPeak) {
     startOfPeakMillis = millis();
     lengthOfPeakMillis = 0;
-    lastPeaksAmplitude = smoothedAmplitude;
   } else if (isPeak) {
     lengthOfPeakMillis = millis() - startOfPeakMillis;
   } else {
     lengthOfPeakMillis = 0;
   }
 
-  Serial.print("LengthOfPeak:");
-  Serial.println(lengthOfPeakMillis);
+  // Serial.print("LengthOfPeak:");
+  // Serial.println(lengthOfPeakMillis);
 }
