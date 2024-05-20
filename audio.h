@@ -1,7 +1,7 @@
 // Analog
-#define MICROPHONE_PIN A1
+#define MICROPHONE_PIN A2
 
-#define SAMPLES_COUNT 200
+#define SAMPLES_COUNT 300
 #define SAMPLING_FREQUENCY 10000 //Hz, must be less than 10000 due to ADC
 #define PEAK_THRESHOLD 0.85
 #define SUPER_PEAK_THRESHOLD 0.95
@@ -53,7 +53,7 @@ void recordAmplitude() {
   bool newIsPeak = peakDetection.getPeak() == 1;
   isStartOfPeak = !isPeak && newIsPeak;
   isPeak = newIsPeak;
-  isSuperPeak = amplitudeRatio > SUPER_PEAK_THRESHOLD;
+  isSuperPeak = peakDetection.getStdRatio() > 2.0;
   Serial.print("IsSuperPeak:");
   Serial.println(isSuperPeak);
   Serial.print("IsPeak:");
@@ -62,8 +62,8 @@ void recordAmplitude() {
   Serial.print("IsStartOfPeak:");
   Serial.println(isStartOfPeak);
 
-  Serial.print("PeakLibraryValue:");
-  Serial.println(peakDetection.getFilt());
+  Serial.print("StdRatio:");
+  Serial.println(peakDetection.getStdRatio());
 
   if (isStartOfPeak) {
     startOfPeakMillis = millis();

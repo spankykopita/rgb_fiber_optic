@@ -3,7 +3,7 @@
 
 #define NUM_LEDS   3
 #define DISPLAY_HERTZ 60
-#define MAX_ROTATION_HERTZ 20.0 
+#define MAX_ROTATION_HERTZ 5.0 
 
 typedef enum {
   spinny,
@@ -47,7 +47,7 @@ void setBrightnessByPeak() {
   // brightness = 255;
   // brightness = mapToByteRange(smoothedAmplitude, minAmplitude, maxAmplitude);
   // brightness = map(smoothedAmplitude, minAmplitude, maxAmplitude, 20, 255);
-  uint8_t brightnessDecay = 30;
+  uint8_t brightnessDecay = 2;
   int nextBrightness = isPeak ? 255 : brightness - brightnessDecay;
   brightness = max(nextBrightness, 0);
 }
@@ -86,7 +86,7 @@ void showSingleLED() {
     selectedLED = (selectedLED + 1) % NUM_LEDS;
   }
 
-  fadeAll(100);
+  fadeAll(20);
   setColorToPixel(selectedLED);
 }
 

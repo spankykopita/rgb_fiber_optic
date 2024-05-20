@@ -21,7 +21,7 @@ void setup() {
 
   Serial.begin(9600);
 
-  peakDetection.begin(20, 1.4, 0.6); // sets the lag, threshold and influence
+  peakDetection.begin(40, 1.8, 0.8); // sets the lag, threshold and influence
 
   scheduler.every(1000 / DISPLAY_HERTZ, [](){
     recordAmplitude();
@@ -36,7 +36,7 @@ void setup() {
       }
     }
   
-    if (lengthOfPeakMillis > 50) {
+    if (lengthOfPeakMillis > 100) {
       visualization = strobe;
     }
 
